@@ -21,7 +21,7 @@ public class UserService {
     
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     
-    public UserModel register(String name, String lastname, String phone, String email, String password){
+    public UserModel register(String name, String lastname, String phone, String email, String password, String role){
         
         logger.info("Registering user with email: {}", email);
         
@@ -41,6 +41,7 @@ public class UserService {
         newUser.setPhone(phone);
         newUser.setEmail(email);
         newUser.setPassword(passwordEncoderUtil.encoderPassword(password));
+        newUser.setRole(role != null ? role : "ROLE_USER"); // Assign role or default to ROLE_USER
         
         logger.info("User registered successfully with email: {}", email);
         

@@ -38,7 +38,8 @@ public class AuthController {
                     loginRequestDTO.getLastname(),
                     loginRequestDTO.getPhone(),
                     loginRequestDTO.getEmail(),
-                    loginRequestDTO.getPassword()
+                    loginRequestDTO.getPassword(),
+                    loginRequestDTO.getRole()
             );
 
             return ResponseEntity.ok(userMapper.toUserDto(user));
@@ -53,7 +54,7 @@ public class AuthController {
 
         if (passwordEncoderUtil.matches(userLoginDTO.getPassword(), user.getPassword())) {
 
-            String token = jwtUtils.generateJwtToken(user.getEmail());
+            String token = jwtUtils.generateJwtToken(user.getEmail(), user.getRole());
 
             return ResponseEntity.ok(token);
 
