@@ -1,10 +1,9 @@
 package com.yukode.loginapirestjwt.config;
 
 import com.yukode.loginapirestjwt.security.JwtUtils;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,8 +12,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-    
+
     private final JwtUtils jwtUtils;
 
     public SecurityConfig(JwtUtils jwtUtils) {
@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth
                             .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN") // Restrict access based on roles
                             .anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

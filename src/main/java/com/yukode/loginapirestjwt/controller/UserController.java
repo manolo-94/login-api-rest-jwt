@@ -22,7 +22,7 @@ public class UserController {
     private UserMapper userMapper;
 
     @GetMapping("/list")
-//    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers()
                 .stream()

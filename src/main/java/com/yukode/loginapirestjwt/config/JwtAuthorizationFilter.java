@@ -6,9 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,7 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String email = jwtUtils.getEmailFromJwToken(jwt);
             String role = jwtUtils.getRoleFromJwtToken(jwt);
             
-            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
             UsernamePasswordAuthenticationToken authenticazion = new UsernamePasswordAuthenticationToken(email, null, authorities);
 
