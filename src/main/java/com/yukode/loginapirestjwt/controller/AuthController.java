@@ -7,6 +7,12 @@ import com.yukode.loginapirestjwt.model.UserModel;
 import com.yukode.loginapirestjwt.security.JwtUtils;
 import com.yukode.loginapirestjwt.service.UserService;
 import com.yukode.loginapirestjwt.util.PasswordEncoderUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +37,14 @@ public class AuthController {
     private PasswordEncoderUtil passwordEncoderUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody UserLoginDTO loginRequestDTO) {
+    @Operation(summary = "Register", description = "Endpoint to register a new user ")
+     @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful new user created",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UserModel.class))),
+        @ApiResponse(responseCode = "401", description = "Invalid Credentials")
+    })
+    public ResponseEntity<UserDTO> register(@Parameter( description = "UserModel to be created", required = true) @RequestBody UserLoginDTO loginRequestDTO) {
 
             UserModel user = userService.register(
                     loginRequestDTO.getName(),
@@ -47,6 +60,13 @@ public class AuthController {
     }
     
     @PostMapping("/login")
+    @Operation(summary = "Login", description = "Endpoint to login user ")
+     @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful return TOKEN",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UserModel.class))),
+        @ApiResponse(responseCode = "401", description = "Invalid Credentials")
+    })
     public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
 
         UserModel user = userService.findByEmail(userLoginDTO.getEmail())
