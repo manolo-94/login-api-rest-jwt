@@ -40,8 +40,8 @@ public class UserServiceTest {
         
         //Creamos un objeto de prueba 
         user1.setId_user(9L);
-        user1.setName("test");
-        user1.setLastname("test");
+        user1.setName("test1");
+        user1.setLastname("test1");
         user1.setEmail("test1@gmail.com");
         user1.setPhone("5555555555");
         user1.setPassword("123");
@@ -68,12 +68,12 @@ public class UserServiceTest {
         when(passwordEncoderUtil.encoderPassword(any(String.class))).thenReturn("passwordEncriptado");
         when(userRepository.save(any(UserModel.class))).thenReturn(user1);
         
-        UserModel registeredUser = userService.register("test", "test", "5555555555", "test@gmail.com", "123", "ROLE_USER");       
+        UserModel registeredUser = userService.register("test1", "test1", "555555555", "test1@gmail.com", "123", "ROLE_USER");       
         
         assertNotNull(registeredUser); // Esta afirmacion confirma que el objeto restiredUser no fue nulo y que fue guardado exitosamente.
-        assertEquals("test@gmail.com", registeredUser.getEmail()); // Esta afirmacion confirma que el email es test@gmail.com y que fue configurado correctamente.
+        assertEquals("test1@gmail.com", registeredUser.getEmail()); // Esta afirmacion confirma que el email es test@gmail.com y que fue configurado correctamente.
         
-        verify(userRepository, times(1)).findUserByEmail("test@gmail.com"); // Esta line se asegura de que el metodo findUserByEmail fue llamado de UserResitory una vez con el email test@gmail.com. Esto asegura que el metodo fue usado como se esperaba en el proceso de registro.
+        verify(userRepository, times(1)).findUserByEmail("test1@gmail.com"); // Esta line se asegura de que el metodo findUserByEmail fue llamado de UserResitory una vez con el email test@gmail.com. Esto asegura que el metodo fue usado como se esperaba en el proceso de registro.
         verify(userRepository, times(1)).save(any(UserModel.class)); // Esto verifica que que el metodo save fue llamado de userRepository una vez con un objeto userModel. Esto asegura que usaurio se ha guardao en el repositorio.
     }
     
@@ -84,11 +84,11 @@ public class UserServiceTest {
         when(userRepository.findUserByEmail(any(String.class))).thenReturn(Optional.of(user1));
         
         RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            userService.register("test", "test", "5555555555", "test@gmail.com", "123", "ROLE_USER");       
+            userService.register("test1", "test1", "5555555555", "test1@gmail.com", "123", "ROLE_USER");       
         });
         
         assertEquals("User already exists whit this email", runtimeException.getMessage());
-        verify(userRepository, times(1)).findUserByEmail("test@gmail.com");
+        verify(userRepository, times(1)).findUserByEmail("test1@gmail.com");
         verify(userRepository, never()).save(any(UserModel.class));
     }
     
@@ -98,11 +98,11 @@ public class UserServiceTest {
     
         when(userRepository.findUserByEmail(any(String.class))).thenReturn(Optional.of(user1));
     
-        Optional<UserModel> foundUser = userService.findByEmail("test@gmail.com");
+        Optional<UserModel> foundUser = userService.findByEmail("test1@gmail.com");
         
         assertTrue(foundUser.isPresent());
-        assertEquals("test@gmail.com", foundUser.get().getEmail());
-        verify(userRepository, times(1)).findUserByEmail("test@gmail.com");
+        assertEquals("test1@gmail.com", foundUser.get().getEmail());
+        verify(userRepository, times(1)).findUserByEmail("test1@gmail.com");
     }
     
     @Test
