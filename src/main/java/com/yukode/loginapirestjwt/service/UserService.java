@@ -1,5 +1,7 @@
 package com.yukode.loginapirestjwt.service;
 
+import com.yukode.loginapirestjwt.exception.UserAlreadyExistsException;
+import com.yukode.loginapirestjwt.exception.UserInvalidCredentialException;
 import com.yukode.loginapirestjwt.model.UserModel;
 import com.yukode.loginapirestjwt.util.PasswordEncoderUtil;
 import java.util.List;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yukode.loginapirestjwt.repository.UserRepository;
+import com.yukode.loginapirestjwt.security.JwtUtils;
 
 @Service
 public class UserService {
@@ -18,6 +21,9 @@ public class UserService {
     
     @Autowired
     private  PasswordEncoderUtil passwordEncoderUtil;
+    
+    @Autowired
+    private JwtUtils jwtUtils;
     
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     
@@ -31,7 +37,9 @@ public class UserService {
             
             logger.warn("User already exists with email: {}", email);
             
-            throw new RuntimeException("User already exists whit this email");
+//            throw new RuntimeException("User already exists whit this email");
+            logger.warn("User already exists with email: {}", email);
+            throw new UserAlreadyExistsException("User already exists whit this email");
         }
         
         UserModel newUser = new UserModel();
@@ -59,6 +67,19 @@ public class UserService {
         
         return userRespository.findAll();
         
+    }
+    
+    public String login(String email, String password){
+         
+        UserModel userModel = findByEmail(email).orElseThrow(() -> new UserInvalidCredentialException("Invalid email or passeord"));
+        
+        if(!passwordEncoderUtil.matches(password, userModel.getPassword())){
+            throw new UserInvalidCredentialException("Invalid email or password");
+        }
+        
+        String token = jwtUtils.generateJwtToken(userModel.getEmail(), userModel.getRole());
+        
+        return token;
     }
     
 }
