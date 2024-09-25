@@ -1,8 +1,10 @@
 package com.yukode.loginapirestjwt.service;
+import com.yukode.loginapirestjwt.exception.UserInvalidCredentialException;
 import com.yukode.loginapirestjwt.model.UserModel;
 import com.yukode.loginapirestjwt.util.PasswordEncoderUtil;
 import org.mockito.Mock;
 import com.yukode.loginapirestjwt.repository.UserRepository;
+import com.yukode.loginapirestjwt.security.JwtUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
+import org.springframework.http.ResponseEntity;
 
 public class UserServiceTest {
     
@@ -25,6 +28,9 @@ public class UserServiceTest {
     
     @Mock // Inidica que sera un objeto simulado o un objeto @Mock
     private PasswordEncoderUtil passwordEncoderUtil;
+    
+    @Mock
+    private JwtUtils jwtUtils;
     
     @InjectMocks // Indica que esta clase recibira como dependecia los @Mock que hemos definido como parametros
     private UserService userService;
@@ -78,6 +84,24 @@ public class UserServiceTest {
     }
     
     @Test
+    @DisplayName("Test Successfull login")
+    void testSuccessLogin(){
+        when(userRepository.findUserByEmail(any(String.class))).thenReturn(Optional.of(user1));
+        when(passwordEncoderUtil.matches(anyString(), anyString())).thenReturn(true);
+        when(jwtUtils.generateJwtToken(anyString(), anyString())).thenReturn("mockedToken");
+        
+        String resultToken = userService.login("test1@gmail.com", "123");
+        
+        assertNotNull(resultToken);
+        assertEquals("mockedToken", resultToken);
+        
+        verify(userRepository, times(1)).findUserByEmail("test1@gmail.com");
+        verify(passwordEncoderUtil, times(1)).matches("123", "123");
+        verify(jwtUtils, times(1)).generateJwtToken("test1@gmail.com", "ROLE_USER");
+       
+    }
+    
+    @Test
     @DisplayName("Should throw an exception when email is already registered")
     void testRegisterUserAlreadyExists(){
         
@@ -90,6 +114,22 @@ public class UserServiceTest {
         assertEquals("User already exists whit this email", runtimeException.getMessage());
         verify(userRepository, times(1)).findUserByEmail("test1@gmail.com");
         verify(userRepository, never()).save(any(UserModel.class));
+    }
+    
+    @Test
+    @DisplayName("Test login invalid credentials")
+    void testLoginInvalidCredentials(){
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(user1));
+        when(passwordEncoderUtil.matches(anyString(), anyString())).thenReturn(false);
+        
+        RuntimeException runtimeException = assertThrows(UserInvalidCredentialException.class, () -> {
+            userService.login("test1@gmail.com", "wrongPassword");
+        });
+        
+        assertEquals("Invalid email or password", runtimeException.getMessage());
+        verify(userRepository, times(1)).findUserByEmail("test1@gmail.com");
+        verify(passwordEncoderUtil, times(1)).matches(anyString(), anyString());
+        verify(jwtUtils, times(0)).generateJwtToken(anyString(), anyString());
     }
     
     @Test

@@ -71,7 +71,7 @@ public class UserService {
     
     public String login(String email, String password){
          
-        UserModel userModel = findByEmail(email).orElseThrow(() -> new UserInvalidCredentialException("Invalid email or passeord"));
+        UserModel userModel = findByEmail(email).orElseThrow(() -> new UserInvalidCredentialException("Invalid email or password"));
         
         if(!passwordEncoderUtil.matches(password, userModel.getPassword())){
             throw new UserInvalidCredentialException("Invalid email or password");
