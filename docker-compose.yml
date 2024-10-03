@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+    mysql:
+        image: mysql:8.0
+        container_name: java-db-loginapirestjwt
+        environment: 
+            MYSQL_ROOT_PASSWORD: V33m02468.
+            MYSQL_DATABASE: dbloginapirestjwt
+#            MYSQL_USER: root
+#            MYSQL_PASSWORD: V33m02468.
+        ports:
+            - "3306:3306"
+        volumes:
+            - db_data:/var/lib/mysql
+        networks:
+            - app-network
+        
+    java-app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: java-app-loginapirestjwt
+        image: yukode-java-app-loginapirestjwt:1.0.0
+        ports:
+            - "8001:8001"
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dbloginapirestjwt?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+            SPRING_DATASOURCE_USERNAME: root
+            SPRING_DATASOURCE_PASSWORD: V33m02468.
+            SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+            SPRING_JPA_HIBERNATE_DDL_AUTO: none
+            SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
+        depends_on:
+            - mysql
+        networks:
+            - app-network
+volumes:
+    db_data:
+
+networks:
+    app-network:
+        driver: bridge
