@@ -9,6 +9,7 @@ services:
             MYSQL_DATABASE: dbloginapirestjwt
 #            MYSQL_USER: root
 #            MYSQL_PASSWORD: V33m02468.
+#        command: --default-authentication-plugin=mysql_native_password
         ports:
             - "3306:3306"
         volumes:
@@ -33,6 +34,7 @@ services:
             SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
         depends_on:
             - mysql
+        restart: always
         networks:
             - app-network
 volumes:
